@@ -1,0 +1,9 @@
+    static String ${proc.name}_STATEMENT =
+    <#list proc.lines as myline>
+    <#if (proc.isStd())>
+    <#if !(myline.isVar())>"</#if>${myline}<#if !myline.isVar()>"</#if><#if myline_has_next> + <#else>;</#if>
+    </#if>
+    </#list>
+    @SqlUpdate(${proc.name}_STATEMENT)
+    @RegisterBeanMapper(${table}Entity.class)
+    void ${proc.name}(${table}Entity ${ToJavaVariableCase(table)}Entity);

@@ -1,0 +1,17 @@
+    <#if (proc.isSProc()==true)>
+        <#assign returnType=(table)+"Entity">
+    <#else>
+        <#assign returnType=(table)+(proc.name)+"Entity">
+    </#if>
+static String ${proc.name}_STATEMENT =
+    <#list proc.lines as myline>
+    <#if !(myline.isVar())>"</#if>${myline}<#if !myline.isVar()>"</#if><#if myline_has_next> + <#else>;</#if>
+    </#list>
+    <#if (proc.outputs?size>0)>
+    @SqlQuery(${proc.name}_STATEMENT)
+    <#else>
+    @SqlUpdate(${proc.name}_STATEMENT)
+    </#if>
+    @RegisterBeanMapper(${returnType}.class)
+    <#if (proc.isSingle())>${returnType}<#else>List<${returnType}></#if> ${proc.name}(<#list proc.inputs as field>${JavaHelpers.JPortalJavaFieldTypeLookup(field.type)} ${ToJavaVariableCase(field.name)}<#if field_has_next>, </#if></#list><#if (proc.dynamics?size > 0)>,</#if><#list proc.dynamics as dynfield>String ${ToJavaVariableCase(dynfield)}<#if dynfield_has_next>, </#if></#list>);
+

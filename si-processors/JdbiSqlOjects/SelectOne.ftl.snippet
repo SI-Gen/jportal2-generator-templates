@@ -1,0 +1,9 @@
+    static String ${proc.name}_STATEMENT =
+    <#list proc.lines as myline>
+    <#if (proc.isStd())>
+    <#if !(myline.isVar())>"</#if>${myline}<#if !myline.isVar()>"</#if><#if myline_has_next> + <#else>;</#if>
+    </#if>
+    </#list>
+    @SqlQuery(${proc.name}_STATEMENT)
+    @RegisterBeanMapper(${table}Entity.class)
+    ${table}Entity ${proc.name}(<#list proc.inputs as field>${JavaHelpers.JPortalJavaFieldTypeLookup(field.type)} ${ToJavaVariableCase(field.name)}<#if field_has_next>, </#if></#list>);

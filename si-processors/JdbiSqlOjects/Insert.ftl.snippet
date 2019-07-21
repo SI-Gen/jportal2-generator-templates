@@ -1,0 +1,40 @@
+    static String ${proc.name}_STATEMENT =
+    "/* PROC ${table.tableName()}Insert */" +
+    "INSERT INTO ${table.tableName()} ( " +
+    <#if (proc.hasReturning)>
+    <#list proc.outputs as outputfield>
+    <#if (outputfield.isSequence())>
+    "   ${outputfield.name}," +
+    </#if>
+    </#list>
+    </#if>
+     <#list proc.inputs as inputfield>
+    "   ${inputfield.name}<#if inputfield_has_next>,</#if> " +
+    </#list>
+    "VALUES (" +
+    <#if (proc.hasReturning)>
+    <#list proc.outputs as outputfield>
+    <#if (outputfield.isSequence())>
+    "   NEXTVAL FOR ${table.name}seq," +
+    </#if>
+    </#list>
+    </#if>
+    <#list proc.inputs as inputfield>
+    "   :${inputfield.name}<#if inputfield_has_next>,</#if> " +
+    </#list>
+    ")" +
+    <#if (proc.hasReturning)>
+    "RETURNING (" +
+    <#list proc.outputs as outputfield>
+    "   ${outputfield.name}<#if outputfield_has_next>,</#if> " +
+    </#list>
+    ")"
+    </#if>
+    ;
+    @SqlUpdate(${proc.name}_STATEMENT)
+    @RegisterBeanMapper(${table}Entity.class)
+<#if (proc.hasReturning) >
+    @GetGeneratedKeys(<#list proc.outputs as outputfield>"${outputfield.name}"<#if outputfield_has_next>,</#if></#list>)
+</#if>
+    <#if (proc.hasReturning) >${JavaHelpers.JPortalJavaFieldTypeLookup(proc.outputs[0].type)}<#else>void</#if> Insert(${table}Entity ${ToJavaVariableCase(table)}Entity);
+
